@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Base64 svg -->
+    <link
+        rel="shortcut icon"
+        href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAGEPAABhDwAAAAAAAAAAAAA2IiL/PS0w/zcnKv8ZBAT/GQAA/3ttb/+OhYb/hnx9/351dv99dHX/b2Rl/yELDf88Ky//QjAy/z0rLv9ALTD/VklL/1tNVP9OPkL/Nyot/0w7P/9KP0H/WEZI/3pqbf9fTVH/d2pt/0UyNf8XAAD/HwoM/0xBR/9dUVX/Wk5R/8XM0f+33ev/dd7y/5Tq+f9ZVl3/FgAE/zYaIv9EIiv/QCAo/2NTXv+tq7P/a2Zv/wMAAP9LTlj/y9vm/8fR1//O1Nr/uN3p/4zl9f+i09f/dn2A/1w3Pf9NIiz/SSAq/0McJv81Exv/fnOA//////+ps7v/Likz/6q4x//I1Nv/1uHo/83Y4f+vv8j/trSy/77Cyf+ptMf/lZeo/4t/iv90Ym7/UT9S/1dHWf/L0N3//////7K8yv+hsMP/w9Lc/+fx9P/U3eT/u73A/6y0wv+wxOT/0+r+/9z2///a9f7/3/n//7/a9/+lssj/wcXL//T8/v/u+fz/ssTW/7jJ1//x+vz/4Ofp/5miuf+Pq9j/1ff//9fv/f/W5/j/yNz1/7fJ8P/X7v7/xd33/6Wvw//q8fP/+f///8bV4v+swNb/7/n7/+Lp7f97lcj/weD6/7unuf/a2uz/4vb//+Hy/v/V5fv/0+j8/9Ps//+gt9r/2N7p///////P3un/nrbT/+jz9//s8/b/g5zF/62mrf+namP/yrm+/+P6///c7Pr/4PD7/9Dl9//Q7f//rMfs/7O91f/C0ub/qMDf/6O93f/s9vn/8/v8/5GjxP9WT1n/QzQ0/6Sxx//I1Of/1N3q/8zh9/+Glqr/aXeC/5yz0P/c5O//wdHj/4Se0/+UsOH/8/7///L7/P+8y+P/z+Hu/5ivyP/D0OP/8ff3/93n8P/i9f//1ef0/7PD0/+4xtb/4+z0/4id0P+Oo9X/pL3i//L9/v/4////ztnp/7bR7v/L1+b//v///+nx9f/P4vP/1+j2/9Th7f/Q2ub/vMbY/7XM8P+zxeX/vczj/8vc9P/z/P7/9v///+v0+f+htdf/5O3x//v////c5/L/qb7f/9vk7P/z+/3/5/D0/7XI5v+wrsD/2eDm/97m8P+xwtv/7vr9/+77/v/x+/7/x83e//X8/f/6////2OLs/9Pc6P/w+f3/4uns/6eVnP+Wgpz/g0hP/+3r6v/5////uMna/+n0+v/y+v7/7fn9/+Xu9P/w+v3/9f7//+31+P/x+fr/+P////P////cxr3/uHph/2cuJ/+onJ3/7Pr+/+Hr9P/P0c7//f////L5+//0/f//0+Lt/9vp8//y/f//7vn9/+/5/f/w/P//8/Pw/5ZwYf+9wsP/2N/i/+35/f/Lyr7/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
+        type="image/x-icon"
+    >
+    <title>GI pull list history</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
+
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.24.0/firebase-database.js"></script>
+
+
+    <script>
+        /**
+         * @description convert size to 'human readable string'
+         * @author Joshaven Potter
+         * @external {Stackoverflow user profile: https://stackoverflow.com/users/121607/joshaven-potter }
+         * @external {Stackoverflow answer: https://stackoverflow.com/a/28120564 }
+         * @external {Stackoverflow whole post: 
+         * https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string }
+         * @param {Number} bytes size in bytes to convert
+         * @returns {String} Size in B/KB/MB/GB/TB/PB
+         */
+        const sizeOf = (bytes) => {
+            if (bytes == 0) { return "0.00 B"; }
+            var e = Math.floor(Math.log(bytes) / Math.log(1024));
+            return (bytes/Math.pow(1024, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B';
+        }
+
+    </script>
+    
+    <style>
+        
+        /* Themes */
+        @media all {
+            
+            .dark{
+                
+        
+                --backgroud: #f0ede9;
+                --main-bg:   #f0ede9;
+        
+                --input-bg: #FFFFFF;
+                    
+                --card-bg: rgba(0, 0, 0, 0.1);
+            
+                --text-dark:   #F1F1F1;
+                --text-light:  #4e4d4b;
+                --text-medium: #373534;
+                --text-accent: #f4c780;
+
+            
+                --bg-light: #F1F1F1;
+                --bg-dark: #393b40;
+                
+
+                --stars-1: #8d897c;
+                --stars-2: #659c71;
+                --stars-3: #6292a1;
+                --stars-4: #a97aaa;
+                --stars-5: #bb7022;
+            }
+        }
+
+
+        *{
+            font-family: 'Fira Sans', sans-serif;
+        }
+        body{
+            height: auto;
+            min-height: calc(100vh - 16px);
+
+            background: var(--main-bg);
+            color: var(--text-light);
+
+            background-repeat: no-repeat;
+            /* font-size: 110%; */
+        }
+
+
+        /* general */
+        @media all {
+            .card-top{
+                border-radius: 4px;
+                background-color: var(--bg-light);
+                box-shadow: 0px 0px 7px 0px rgba(0, 0, 0, 0.1);
+            }
+            
+            .arrow-icon path{
+                stroke: var(--bg-dark);
+            }
+            .arrow-up{
+                padding: 7px;
+                padding-top: 0;
+                padding-left: 0;
+                transform: rotate(180deg);
+            }
+            
+            
+            .btn{
+                transition: all 200ms ease-in-out;
+                border: none;
+                border-radius: 4px;
+                font-size: 90%;
+                cursor: pointer;
+                padding: 5px 10px;
+                min-height: 32px;
+
+                vertical-align: top;
+                background-color: var(--bg-dark);
+                color: var(--text-accent);
+            
+            }
+            
+            .inpt{
+                background: var(--input-bg);
+                border-radius: 4px;
+                padding: 5px 10px;
+                border: none;
+                font-size: 90%;
+                color: var(--text-light);
+                outline: none;
+                min-height: 20px;
+                border: var(--text-medium) solid 1px;
+            }
+
+            .sel-option{
+                background: var(--bg-light);
+                color: var(--text-medium);
+                border: none;
+            }
+    
+            
+            .stars-inpt{
+                width: 47px;
+                /* padding: 5px 6px; */
+                padding-right: 0px;
+            }
+            
+            
+            
+            /* links */
+            @media all {
+                .link{
+                    text-decoration: none;
+                    color: var(--stars-3);
+                    transition: all 200ms ease-in-out;
+                }
+                .link:hover{
+                    text-shadow: var(--text-shadown-tr-screen);
+                    font-size: 103%;
+                    cursor: pointer;
+                    text-decoration: underline;
+                    padding: 0px 3px 5px 0px;
+                }
+                
+            }
+            
+        }
+
+        .main-cont{
+            display: flex;
+            flex-direction: column;
+        }
+
+        .notif{
+            width: fit-content;
+            display: inline;
+            margin-left: 10px;
+        }
+
+        
+
+        /* list */
+        @media all {
+            .pullList{
+                padding-left: 10px;
+                list-style: none;
+                display: flex;
+                flex-direction: column;
+            }
+
+
+            .list-li-item{
+                margin: 5px;
+            }
+            .list-item{
+                padding: 10px;
+            }
+            .rendered-item{
+                box-shadow: none;
+                background-color: var(--input-bg);
+            }
+            .rendered-item:hover{
+                background-color: var(--text-accent);
+            }
+
+            .list-remv{
+                float: right;
+                cursor: pointer;
+            }
+            
+            .list-item .close{
+                max-width: 15px;
+                margin: 2px;
+            }
+            
+            .list-header{
+                min-width: 110px;
+                /* width: 100px; */
+                display: inline-block;
+                cursor: pointer;
+            }
+
+            .list-date{
+                min-width: 110px;
+                text-align: center;
+                /* width: 100px; */
+                display: inline-block;
+            }
+
+            .list-type{
+                width: 90px;
+                display: inline-block;
+                text-align: end;
+            }
+
+            .list-stars{
+                background: var(--stars-5);
+                color: var(--text-dark);
+                padding: 2px 6px;
+                border-radius: 3px;
+            }
+
+            .list-count{
+                font-size: 80%;
+                vertical-align: middle;
+            }
+        }
+
+
+        .stats{
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .stat-card{
+            width: 110px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 10px;
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .s-last-pull{
+            width: 300px;
+        }
+
+        .stat-card .s-header{
+            font-size: 90%;
+            margin-bottom: 10px;
+        }
+        .stat-card .s-data-main{
+            text-align: center;
+            font-size: 210%;
+        }
+        .stat-card .s-foot{
+            display: flex;
+            margin: 0 auto;
+            width: fit-content;
+            position: absolute;
+            bottom: 10px;
+            text-align: center;
+        }
+        
+        .stat-card .s-foot img{
+            max-width: 30px;
+        }
+        .stat-card .s-foot .s-data-sub{
+            max-width: 15px;
+            margin: auto 10px;
+            width: fit-content;
+        }
+
+
+    </style>
+</head>
+
+<body class="dark">
+
+    <div id="app">
+        <div class="main-cont">
+            <!-- https://rand-xi.now.sh/GI/primogem.png -->
+            <noscript>This page requires Javascript to work!</noscript>
+
+            <div class="stats" v-if="stats">
+
+                <div class="stat-card card-top" v-if="stats.pulls">
+                    <i class="s-header">pulls</i>
+                    <b class="s-data-main">{{stats.pulls.total}}</b>
+                    
+                    <div class="s-foot">
+                        <img src="https://rand-xi.now.sh/GI/primogem.png" alt="primogem icon">
+                        <div class="s-data-sub">{{stats.pulls.primogems}}</div>
+                    </div>
+                </div>
+
+                <div class="stat-card card-top" v-if="stats.pulls">
+
+                    <i class="s-header">pulls since</i>
+    
+                    <div style="margin: 5px 0;">
+                        <a class="list-stars" style="background-color: var(--stars-5);">5*</a> {{stats.pulls.since4}}
+                    </div>
+                    <div style="margin: 5px 0;">
+                        <a class="list-stars" style="background-color: var(--stars-4);">4*</a> {{stats.pulls.since4}}
+                    </div>
+                    
+                </div>
+
+                <div class="s-last-pull stat-card card-top" v-if="stats.last.star5">
+                    <i class="s-header">last <a class="list-stars" style="background-color: var(--stars-5);">5*</a> - {{enums.types[stats.last.star5.type]}}</i>
+                    <a class="s-header">{{dateOf(stats.last.star5.date)}}</a>
+                    <b>{{stats.last.star5.name}}</b>
+                </div>
+               
+               
+                <div class="s-last-pull stat-card card-top" v-if="stats.last.star4">
+                    <i class="s-header">last <a class="list-stars" style="background-color: var(--stars-4);">4*</a> - {{enums.types[stats.last.star4.type]}}</i>
+                    <a class="s-header">{{dateOf(stats.last.star4.date)}}</a>
+                    <b>{{stats.last.star4.name}}</b>
+                </div>
+
+
+
+            </div>
+
+
+            <!-- list -->
+            <div class="list-cont">
+                <ul class="pullList" >
+
+                    <!-- add item -->
+                    <li class="list-li-item" >
+                        <div class="list-item">
+                            <select v-model="newit.type" class="inpt">
+                                <option class="sel-option" value="-1">Type</option>
+                                <option class="sel-option" v-for="(e, i) of enums.types" :value="i">{{e}}</option>
+                            </select>
+                            <input type="number" class="stars-inpt inpt" placeholder="stars" v-model="newit.stars" required>
+                            <input type="text" class="inpt" placeholder="name" v-model="newit.name" required>
+                            <input type="datetime-local" class="inpt" placeholder="Date" v-model="newit.date">
+                            <button class="btn" @click="add">Add</button>
+
+                            <div class="notif" v-if="notify.show">
+                                <a>{{notify.msg}}</a>
+                                <button class="btn" @click="notify.action">{{notify.btnText}}</button>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- header -->
+                    <li class="list-li-item" >
+                        <div class="list-item">
+                            <a class="list-header" @click="sortBy('date')"  :title="'Click to sort by date [' + sortByOps.date + ']'"> date </a>
+                            <a class="list-header" @click="sortBy('stars')" :title="'Click to sort by stars [' + sortByOps.stars + ']'"> stars &nbsp; &nbsp; type </a>
+                            <a class="list-header" @click="sortBy('name')"  :title="'Click to sort by name [' + sortByOps.name + ']'"> name </a>
+                        </div>
+                    </li>
+
+                    <!-- list renderer from array -->
+                    <li class="list-li-item" v-for="(it, i) of items" >
+                        <div class="rendered-item list-item card-top" :title="it.keyy">
+                            <a class="list-count">{{i}}</a>
+                            <a class="list-date" :title="fullDateOf(it.time)"> {{dateOf(it.date)}} </a>
+                            <a class="list-stars" :style="{
+                                'background':'var(--stars-'+ it.stars+')'
+                            }">{{it.stars}}*</a>
+                            <a class="list-type">{{enums.types[it.type]}} | </a>
+                            <a class="list-title" :title="it.keyy">{{it.name}}</a>
+                            <a class="list-remv scalable" @click="delet(it)" title="Remove item"> x </a>
+                        </div>
+                    </li>
+
+                    <!-- footer -->
+                    <li class="list-li-item">
+                        <div class="list-item" style="text-align: center;">
+                            <a
+                                target="blank"
+                                :href="databaseDashboardUrl"
+                                class="link current-list-item"
+                            >my database dashboard and data</a>
+                            &nbsp;&nbsp;
+                            &nbsp;&nbsp;
+                            <a :href="helpUrl" target="blank" class="link current-list-item" >help</a>
+                        </div>
+                    </li>
+
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const helpUrl = "https://github.com/Matsukii/GI-pull-history";
+        
+        
+        // - only projectId is strictly required, but if possible add databaseURL
+        // - if the databaseURL isn't set, the app will try to create from project id
+        
+        // CHANGE THE the <id> by your projectId
+        firebaseConfig = {
+            projectId: "<id>"
+        }
+        
+        
+        // OR PASTE FIREBASE CONFIG DOWN HERE
+
+        
+        
+
+
+
+
+
+        
+        // Initialize Firebase
+        try{
+            if(!firebaseConfig || !firebaseConfig.databaseURL){
+                if(firebaseConfig.projectId != ""){
+                    firebase.initializeApp({
+                        ...firebaseConfig,
+                        databaseURL: `https://${firebaseConfig.projectId}.firebaseio.com`
+                    });
+                }
+            }
+            else{
+                firebase.initializeApp(firebaseConfig);
+            }
+        }
+        catch(e){
+            alert("Please add Firebase config!\nFirebase realtime database config is required.\n\nNeed help? close this box and click on help at page bottom\nOR\nGo to "+helpUrl)
+        }
+
+
+
+        // ------ END OF FIREBASE CONFIG & START ------
+
+
+
+        // Vue app framework
+        let app = new Vue({
+            el:"#app",
+            data:{
+                newit:{
+                    type:-1,
+                    name:"",
+                    date:0,
+                    stars:''
+                },
+                db: firebase.database(),
+                items: [],
+                blank:'',
+                helpUrl: helpUrl,
+
+                pull:{
+                    primogems: 160,
+                },
+                notify:{
+                    show: false,
+                    msg:"hi",
+                    btnText:"hi",
+                    action: ()=>{
+                        alert("hi")
+                    } 
+                },
+
+                sortByOps:{
+                    date:'',
+                    stars:'',
+                    name:'',
+                },
+                enums:{
+                    types:[
+                        "Character",
+                        "Weapon"
+                    ]
+                }
+            },
+            computed:{
+                list(){
+                    return this.db.ref('/gi/pulls/items')
+                },
+                deletes(){
+                    return this.db.ref('/gi/pulls/deletes')
+                },
+                databaseDashboardUrl(){
+                    return `https://console.firebase.google.com/u/0/project/${firebaseConfig.projectId}/database`
+                },
+                stats(){
+                    let items = JSON.parse(JSON.stringify(this.items));
+                    let star4 = items.sort(this.sorter('date').dec).filter(el => el.stars == 4)[0];
+                    let star5 = items.sort(this.sorter('date').dec).filter(el => el.stars == 5)[0];
+                    
+                    let since4=0;
+                    let since5=0;
+                    items.sort(this.sorter('date').dec).forEach((el, i) => {
+                        if(el.stars == 4 && since4 == 0) since4 = i;
+                        if(el.stars == 5 && since5 == 0) since5 = i;
+                    })
+                    
+                    return{
+                        last:{
+                            star4,
+                            star5,
+                        },
+                        pulls:{
+                            total:items.length,
+                            primogems:items.length*this.pull.primogems,
+                            money:items.length*this.pull.price,
+                            since4,
+                            since5,
+                        },
+                    }
+                }
+            },
+            created(){
+                this.blank = JSON.stringify(this.newit);
+
+                this.list.on("value", snap => {
+                    this.items = [];
+                    snap.forEach(el => {
+                        this.items.push({...el.val(), keyy: el.key})
+                    })
+                    setTimeout(() => {
+                        this.sortBy('date', 'dec')
+                    }, 200)
+                })
+
+                //app.list.on("value", snap => {
+                //    snap.forEach(el => console.log({...el.val(), keyy: el.key}))
+                //})
+            },
+            methods:{
+                clear(){
+                    this.newit = JSON.parse(this.blank);
+                },
+                add(){
+                    if(this.newit.name){
+                        this.newit.date = this.newit.date == 0 ? Date.now() : new Date(this.newit.date).getTime()
+                        this.list.push({...this.newit, num: this.items.length+1})
+                        this.clear()
+                    }
+                    
+                },
+
+                showNotification(data){
+                    let blank = JSON.stringify(this.notify);
+                    this.notify = {...this.notify, ...data, show: true};
+                    if(this.notify.timer) clearTimeout(this.notify.timer);
+                    this.notify.timer = setTimeout(()=>{
+                        this.notify = JSON.parse(blank)
+                    }, 10000)
+                    
+                },
+                delet(item){
+                    if(confirm("move item to deleted?")){
+                        this.deletes.child(`/${item.keyy}`).set(item)
+                        this.list.child(`/${item.keyy}`).remove().then(r => {
+                            this.showNotification({
+                                msg:"Item removed!",
+                                btnText:"Undo?",
+                                action: () =>{
+                                    this.list.child(`/${item.keyy}`).set(item);
+                                    this.deletes.child(`/${item.keyy}`).remove();
+                                    this.notify.show = false;
+                                }
+                            })
+                            
+                        }).catch((err) => {
+                            console.error(err);
+                        });
+                    }
+                },
+
+                sorter(name){
+                    return{
+                        asc(a, b){
+                            if (a[`${name}`] < b[`${name}`]) { return -1; }
+                            if (a[`${name}`] > b[`${name}`]) { return 1; }
+                            return 0;        
+                        },
+                        dec(a, b){
+                            if (a[`${name}`] > b[`${name}`]) { return -1; }
+                            if (a[`${name}`] < b[`${name}`]) { return 1; }
+                            return 0;        
+                        }
+                    }
+                },
+
+                sortBy(prop, by=null){
+                    if(by){
+                        this.items = this.items.sort(this.sorter(prop)[by])
+                        this.sortByOps[prop] = by
+                    }
+                    else if(by === null){
+                        if(this.sortByOps[prop] == 'asc'){
+                            this.items = this.items.sort(this.sorter(prop).dec)
+                            this.sortByOps[prop] = 'dec'
+                        }
+                        else{
+                            this.items = this.items.sort(this.sorter(prop).asc)
+                            this.sortByOps[prop] = 'asc'
+                        }
+                    }
+                    
+                },
+
+
+                /**
+                 * @description get date in MM/DD H:M of a timestamp
+                 *
+                 * @param {Number} timestamp date in timestamp
+                 */
+                dateOf(timestamp){
+                    let d = new Date(timestamp);
+                    return `${d.toDateString()
+                        .substr(4,3)}/${d.getDate()} ${d.getHours()}:${`${d.getMinutes()}`.padStart(2, 0)}`
+                },
+                 /**
+                 * @description get date in MM/DD H:M of a timestamp
+                 *
+                 * @param {Number} timestamp date in timestamp
+                 */
+                fullDateOf(timestamp){
+                    return new Date().toString().substring(0, 34)
+                },
+            }
+        })
+
+
+    </script>
+
+
+</body>
+</html>
